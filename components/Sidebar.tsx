@@ -16,17 +16,17 @@ const routes = [
 		icon: HomeIcon,
 	},
 	{
-		href: 'workflows',
+		href: '/workflows',
 		label: '流水线',
 		icon: Layers2Icon,
 	},
 	{
-		href: 'credentials',
+		href: '/credentials',
 		label: '授权',
 		icon: ShieldCheckIcon,
 	},
 	{
-		href: 'billing',
+		href: '/billing',
 		label: '统计',
 		icon: CoinsIcon,
 	},
