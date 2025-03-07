@@ -6,6 +6,7 @@ export function createFlowNode(nodeType: TaskType, position?: {x: number, y: num
 		id: crypto.randomUUID(),
 		type: 'Node',
 		position: position ?? {x: 0, y: 0},
+		dragHandle: '.drag-handle',
 		data: {
 			type: nodeType,
 			inputs: {},

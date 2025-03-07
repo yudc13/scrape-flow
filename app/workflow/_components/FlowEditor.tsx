@@ -31,6 +31,7 @@ const FlowEditor = ({ workflow }: Props) => {
 				onNodesChange={onNodesChange}
 				onEdgesChange={onEdgesChange}
 				nodeTypes={nodeTypes}
+				proOptions={{ hideAttribution: true  }}
 			>
 				<Controls position={'top-left'} />
 				<Background />
