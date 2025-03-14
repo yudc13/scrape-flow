@@ -10,9 +10,15 @@ export const LaunchBrowserTask = {
 		{
 			name: '网站URL',
 			type: TaskParamType.STRING,
-			helperText: '输入网址',
+			helperText: '例如: https://example.com',
 			required: true,
 			hideHandle: true
+		}
+	],
+	outputs: [
+		{
+			name: 'Web page2',
+			type: TaskParamType.BROWSER_INSTANCE,
 		}
 	]
 }

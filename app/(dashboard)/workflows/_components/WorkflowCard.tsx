@@ -41,7 +41,7 @@ const WorkflowCard = ({workflow}: { workflow: Workflow }) => {
 					</div>
 				</div>
 				<div className={'flex items-center space-x-2'}>
-					<Link href={`/workflow/edit/${workflow.id}`}
+					<Link href={`/workflow/editor/${workflow.id}`}
 					      className={cn(buttonVariants({variant: 'outline', size: 'sm'}), 'flex items-center gap-2')}>
 						<ShuffleIcon size={16}/>
 						编辑
