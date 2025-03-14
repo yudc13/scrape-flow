@@ -11,7 +11,7 @@ import {
 	addEdge,
 	Background, Connection,
 	Controls,
-	Edge,
+	Edge, getOutgoers,
 	ReactFlow,
 	ReactFlowJsonObject,
 	useEdgesState,
@@ -32,8 +32,8 @@ const nodeTypes = {
 };
 
 const edgeTypes = {
-	default: DeletableEdge
-}
+	default: DeletableEdge,
+};
 
 
 const FlowEditor = ({workflow}: Props) => {
@@ -94,7 +94,7 @@ const FlowEditor = ({workflow}: Props) => {
 
 		// 连线时 需要清除target的值
 		if (!connection.targetHandle) {
-			return
+			return;
 		}
 		// 找到目标节点
 		const node = nodes.find(node => node.id === connection.target);
@@ -109,7 +109,7 @@ const FlowEditor = ({workflow}: Props) => {
 
 		updateNodeData(node.id, {
 			inputs: nodeInputs,
-		})
+		});
 
 	}, [nodes, setEdges, updateNodeData]);
 
@@ -117,32 +117,47 @@ const FlowEditor = ({workflow}: Props) => {
 
 		// 不允许自己连接自己
 		if (connection.source === connection.target) {
-			return false
+			return false;
 		}
 
-		const source = nodes.find(node => node.id === connection.source)
-		const target = nodes.find(node => node.id === connection.target)
+		const source = nodes.find(node => node.id === connection.source);
+		const target = nodes.find(node => node.id === connection.target);
 
 		if (!source || !target) {
 			console.error('invalid connection: source or target node not found');
-			return false
+			return false;
 		}
 
 		// 类型不同相同,不可以连接
-		const sourceTask = TaskRegistry[source.data.type]
-		const targetTask = TaskRegistry[target.data.type]
+		const sourceTask = TaskRegistry[source.data.type];
+		const targetTask = TaskRegistry[target.data.type];
 
-		const input = targetTask.inputs.find(input => input.name === connection.targetHandle)
+		const input = targetTask.inputs.find(input => input.name === connection.targetHandle);
 
-		const output = sourceTask.outputs.find(output => output.name === connection.sourceHandle)
+		const output = sourceTask.outputs.find(output => output.name === connection.sourceHandle);
 
 		if (input?.type !== output?.type) {
 			console.error('invalid connection: type mismatch');
-			return false
+			return false;
 		}
 
-		return true
-	}, [nodes]);
+		// 不允许循环
+		const hasCycle = (node: AppNode, visited = new Set()) => {
+			if (visited.has(node.id)) return false;
+
+			visited.add(node.id);
+
+			for (const outgoer of getOutgoers(node, nodes, edges)) {
+				if (outgoer.id === connection.source) return true;
+				if (hasCycle(outgoer, visited)) return true;
+			}
+		};
+
+		if (target.id === connection.source) return false;
+
+		return !hasCycle(target);
+
+	}, [nodes, edges]);
 
 	return (
 		<main className={'h-full w-full'}>

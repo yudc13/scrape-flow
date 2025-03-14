@@ -1,5 +1,6 @@
 'use client'
 
+import ExecuteBtn from '@/app/workflow/_components/topbar/ExecuteBtn';
 import SaveBtn from '@/app/workflow/_components/topbar/SaveBtn';
 import TooltipWrapper from '@/components/TooltipWrapper';
 import { Button } from '@/components/ui/button';
@@ -28,7 +29,8 @@ const TopBar = ({title, subTitle, workflowId}: Props) => {
 					}
 				</div>
 			</div>
-			<div>
+			<div className={'flex items-center gap-4'}>
+				<ExecuteBtn workflowId={workflowId} />
 				<SaveBtn workflowId={workflowId} />
 			</div>
 		</header>

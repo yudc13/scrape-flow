@@ -11,7 +11,7 @@ import { CoinsIcon, CopyIcon, GripVerticalIcon, TrashIcon } from 'lucide-react';
 
 function NodeHeader({taskType, nodeId}: { taskType: TaskType, nodeId: string }) {
 	const task = TaskRegistry[taskType]
-	const {deleteElements, getNodes, getNode, addNodes} = useReactFlow()
+	const {deleteElements, getNode, addNodes} = useReactFlow()
 	return (
 		<div className={'flex items-center gap-2 p-2'}>
 			<task.icon size={24} />
@@ -21,9 +21,9 @@ function NodeHeader({taskType, nodeId}: { taskType: TaskType, nodeId: string }) 
 			<div className={'flex gap-1 items-center'}>
 				<Badge className={'gap-2 flex items-center text-xs'}>
 					<CoinsIcon size={16} />
-					TODO
+					{task.credits}
 				</Badge>
-				<Button variant={'ghost'} size={'icon'} onClick={() => deleteElements({nodes: getNodes().filter(node => node.id === nodeId)})}>
+				<Button variant={'ghost'} size={'icon'} onClick={() => deleteElements({ nodes: [{ id: nodeId }] })}>
 					<TrashIcon size={12} />
 				</Button>
 				<Button variant={'ghost'} size={'icon'} onClick={() => {
