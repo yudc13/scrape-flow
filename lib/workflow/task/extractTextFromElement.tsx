@@ -20,11 +20,11 @@ export const ExtractTextFromElementTask = {
 			type: TaskParamType.STRING,
 			required: true,
 		}
-	],
+	] as const,
 	outputs: [
 		{
-			name: '提取的文本',
+			name: 'Extract Text',
 			type: TaskParamType.STRING,
 		},
-	]
+	] as const
 } satisfies WorkflowTask

@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -15,46 +12,46 @@ model Workflow {
   userid      String
   name        String
   description String?
+  definition  String
 
-  definition String
-  status     String
+  lastRunAt     DateTime?
+  lastRunId     String?
+  lastRunStatus String?
 
-  createAt DateTime @default(now())
-  updateAt DateTime @updatedAt
-
+  status    String
+  createAt  DateTime            @default(now())
+  updateAt  DateTime            @updatedAt
   execution WorkflowExecution[]
 
   @@unique([userid, name])
 }
 
 model WorkflowExecution {
-  id         String    @id @default(cuid())
-  workflowId String
-  userid     String
-  trigger    String
-  status     String
-  createAt   DateTime  @default(now())
-  startAt    DateTime?
-  completeAt DateTime?
-
-  workflow Workflow        @relation(fields: [workflowId], references: [id], onDelete: Cascade)
-  phase    ExectionPhase[]
+  id              String           @id @default(cuid())
+  workflowId      String
+  userid          String
+  trigger         String
+  status          String
+  creditsConsumed Int              @default(0)
+  createAt        DateTime         @default(now())
+  startAt         DateTime?
+  completeAt      DateTime?
+  phase           ExecutionPhase[]
+  workflow        Workflow         @relation(fields: [workflowId], references: [id], onDelete: Cascade)
 }
 
-model ExectionPhase {
-  id         String    @id @default(cuid())
-  userid     String
-  status     String
-  number     Int
-  node       String
-  name       String
-  startAt    DateTime?
-  completeAt DateTime?
-  inputs     String?
-  outputs    String?
-
-  creditsCost Int?
-
-  workflowExectionId String
-  exection           WorkflowExecution @relation(fields: [workflowExectionId], references: [id], onDelete: Cascade)
+model ExecutionPhase {
+  id                  String            @id @default(cuid())
+  userid              String
+  status              String
+  number              Int
+  node                String
+  name                String
+  startAt             DateTime?
+  completeAt          DateTime?
+  inputs              String?
+  outputs             String?
+  creditsConsumed     Int?
+  workflowExecutionId String
+  exection            WorkflowExecution @relation(fields: [workflowExecutionId], references: [id], onDelete: Cascade)
 }

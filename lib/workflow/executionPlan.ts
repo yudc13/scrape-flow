@@ -1,6 +1,6 @@
 import { AppNode, AppNodeMissingInputs } from '@/types/appNode'
 import { WorkflowExecutionPlan, WorkflowExecutionPlanPhase } from '@/types/workflow'
-import { Edge, getIncomers } from '@xyflow/react'
+import { Edge } from '@xyflow/react'
 import { TaskRegistry } from './task/register'
 
 export enum FlowToExecutionPlanValidationError {
@@ -102,7 +102,7 @@ export function flowToExecutionPlan(nodes: AppNode[], edges: Edge[]): FlowToExec
 	}
 }
 
-function getInvalidInputs(node: AppNode, edges: Edge[], pland: Set<string>) {
+function getInvalidInputs(node: AppNode, edges: Edge[], plan: Set<string>) {
 	const invalidInputs = []
 	const inputs = TaskRegistry[node.data.type].inputs
 
@@ -119,7 +119,7 @@ function getInvalidInputs(node: AppNode, edges: Edge[], pland: Set<string>) {
 
 		// 该输入是必填并且有输入并且输入已经处理过放入执行计划
 		const requiredInputProvideByVisitedOutput =
-			input.required && inputLinkedToOutput && pland.has(inputLinkedToOutput.source)
+			input.required && inputLinkedToOutput && plan.has(inputLinkedToOutput.source)
 
 		if (requiredInputProvideByVisitedOutput) {
 			continue
@@ -128,7 +128,7 @@ function getInvalidInputs(node: AppNode, edges: Edge[], pland: Set<string>) {
 			if (!inputLinkedToOutput) {
 				continue
 			}
-			if (inputLinkedToOutput && pland.has(inputLinkedToOutput.source)) {
+			if (inputLinkedToOutput && plan.has(inputLinkedToOutput.source)) {
 				continue
 			}
 		}
@@ -136,4 +136,20 @@ function getInvalidInputs(node: AppNode, edges: Edge[], pland: Set<string>) {
 	}
 
 	return invalidInputs
+}
+
+function getIncomers(node: AppNode, nodes: AppNode[], edges: Edge[]) {
+	if (!node.id) {
+		return []
+	}
+	const incomersIds = new Set()
+
+	for (const edge of edges) {
+		if (edge.target === node.id) {
+			incomersIds.add(edge.source)
+		}
+	}
+
+	return nodes.filter((node) => incomersIds.has(node.id))
+
 }

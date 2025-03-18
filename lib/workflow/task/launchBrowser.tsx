@@ -10,17 +10,17 @@ export const LaunchBrowserTask = {
 	credits: 1,
 	inputs: [
 		{
-			name: '网站URL',
+			name: 'Website Url',
 			type: TaskParamType.STRING,
 			helperText: '例如: https://example.com',
 			required: true,
 			hideHandle: true
 		}
-	],
+	] as const,
 	outputs: [
 		{
 			name: 'Web page2',
 			type: TaskParamType.BROWSER_INSTANCE,
 		}
-	]
+	] as const
 } satisfies WorkflowTask
