@@ -13,8 +13,8 @@ export async function launchBrowserExecutor(environment: ExecutionEnvironment<ty
 		environment.setPage(page)
 		await page.goto(websiteUrl);
 		return true
-	} catch (e) {
-		console.error(e);
+	} catch (e: any) {
+		environment.log.error(`launchBrowserExecutor: ${e.message}`)
 		return false
 	}
 }

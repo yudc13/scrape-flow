@@ -39,14 +39,12 @@ export async function executeWorkflow(executionId: string) {
 
 	const edges = JSON.parse(execution.workflow.definition).edges as Edge[];
 
-	const logCollector = createLogCollector()
-
 	for (const phase of execution.phase) {
-		const {success} = await executionWorkflowPhase(phase, environment, edges, logCollector);
+		const {success} = await executionWorkflowPhase(phase, environment, edges);
 		// 执行某一步失败 直接终止执行
 		if (!success) {
 			executionFailed = true;
-			break
+			break;
 		}
 	}
 
@@ -127,9 +125,12 @@ async function finalizeWorkflowExecution(
 		});
 }
 
-async function executionWorkflowPhase(phase: ExecutionPhase, environment: Environment, edges: Edge[], logCollector: LogCollector) {
+async function executionWorkflowPhase(phase: ExecutionPhase, environment: Environment, edges: Edge[]) {
+	const logCollector = createLogCollector();
+
 	const startAt = new Date();
 	const node = JSON.parse(phase.node) as AppNode;
+
 
 	await prisma.executionPhase.update({
 		where: {id: phase.id},
@@ -150,13 +151,13 @@ async function executionWorkflowPhase(phase: ExecutionPhase, environment: Enviro
 
 	const outputs = environment.phases[node.id].outputs;
 
-	await finalizePhase(phase.id, success, outputs);
+	await finalizePhase(phase.id, success, outputs, logCollector);
 
 	return {success};
 
 }
 
-async function finalizePhase(phaseId: string, success: boolean, outputs: Record<string, string>) {
+async function finalizePhase(phaseId: string, success: boolean, outputs: Record<string, string>, logCollector: LogCollector) {
 
 	const finalizeStatus = success ? ExecutionPhaseStatus.COMPLETED : ExecutionPhaseStatus.FAILED;
 
@@ -168,6 +169,15 @@ async function finalizePhase(phaseId: string, success: boolean, outputs: Record<
 			status: finalizeStatus,
 			completeAt,
 			outputs: JSON.stringify(outputs),
+			logs: {
+				createMany: {
+					data: logCollector.getAll().map(log => ({
+						message: log.message,
+						logLevel: log.level,
+						timestamp: log.timestamp,
+					})),
+				},
+			},
 		},
 	});
 }
@@ -233,7 +243,7 @@ function createExecutionEnvironment<T extends WorkflowTask>(node: AppNode, envir
 			return environment.page;
 		},
 
-		log: logCollector
+		log: logCollector,
 	};
 }
 

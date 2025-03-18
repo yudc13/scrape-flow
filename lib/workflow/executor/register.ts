@@ -1,4 +1,4 @@
-import { extractTextFromElement } from '@/lib/workflow/executor/extractTextFromElement';
+import { extractTextFromElementExecutor } from '@/lib/workflow/executor/extractTextFromElementExecutor';
 import { launchBrowserExecutor } from '@/lib/workflow/executor/launchBrowserExecutor';
 import { pageToHtmlExecutor } from '@/lib/workflow/executor/pageToHtmlExecutor';
 import { ExecutionEnvironment } from '@/types/executor';
@@ -14,5 +14,5 @@ type Register = {
 export const ExecutorRegister: Register = {
 	LAUNCH_BROWSER: launchBrowserExecutor,
 	PAGE_TO_HTML: pageToHtmlExecutor,
-	EXTRACT_TEXT_FROM_ELEMENT: extractTextFromElement,
+	EXTRACT_TEXT_FROM_ELEMENT: extractTextFromElementExecutor,
 }
