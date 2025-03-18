@@ -24,7 +24,7 @@ type ExecutionData = Awaited<ReturnType<typeof getWorkflowExecutionWithPhase>>
 
 export function ExecutionViewer({execution}: { execution: ExecutionData }) {
 
-	const [selectedPhase, setSelectedPhase] = useState<string | null>(null)
+	const [selectedPhase, setSelectedPhase] = useState<string | null>(null);
 
 	const query = useQuery({
 		queryKey: ['workflow-execution', execution?.id],
@@ -36,42 +36,42 @@ export function ExecutionViewer({execution}: { execution: ExecutionData }) {
 	const phaseQuery = useQuery({
 		queryKey: ['phaseDetails', selectedPhase],
 		enabled: selectedPhase !== null,
-		queryFn: () => getWorkflowPhaseDetails(selectedPhase!)
-	})
+		queryFn: () => getWorkflowPhaseDetails(selectedPhase!),
+	});
 
-	const duration = datesToDurationString(query?.data?.completeAt, query?.data?.startAt)
+	const duration = datesToDurationString(query?.data?.completeAt, query?.data?.startAt);
 
 	const isRunning = query?.data?.status === WorkFlowExecutionStatus.RUNNING;
 
 	return (
-		<div className={'flex flex-col w-full h-full'}>
+		<div className={'flex w-full h-full'}>
 			<aside className={'w-[440px] border-r-2 border-separate flex flex-grow flex-col overflow-hidden'}>
 				<div className={'p-4 flex flex-col gap-4'}>
 					<ExecutionLabel icon={CircleDashedIcon} label={'状态'} value={query?.data?.status}/>
 					<ExecutionLabel
 						icon={CalendarIcon}
-						label={'开始时间'}
+						label={'执行时间'}
 						value={query?.data?.startAt ? formatDistanceToNow(query?.data?.startAt, {addSuffix: true}) : '-'}
 					/>
 					<ExecutionLabel
 						icon={ClockIcon}
 						label={'运行时间'}
-						value={duration ? duration : <Loader2Icon className={'animate-spin'} size={20} />}
+						value={duration ? duration : <Loader2Icon className={'animate-spin'} size={20}/>}
 					/>
 					<ExecutionLabel
 						icon={CoinsIcon}
-						label={'消耗'}
+						label={'信用'}
 						value={'TODO'}
 					/>
 				</div>
-				<Separator />
+				<Separator/>
 				<div className={'flex items-center justify-center py-4'}>
 					<div className={'flex items-center gap-2 text-muted-foreground'}>
-						<WorkflowIcon size={20} className={'stroke-muted-foreground/80'} />
+						<WorkflowIcon size={20} className={'stroke-muted-foreground/80'}/>
 						<span className="font-semibold">执行步骤</span>
 					</div>
 				</div>
-				<Separator />
+				<Separator/>
 				<div className={'h-full overflow-auto p-4 flex flex-col gap-2'}>
 					{
 						query?.data?.phase.map((phase, index) => (
@@ -81,9 +81,9 @@ export function ExecutionViewer({execution}: { execution: ExecutionData }) {
 								className={'w-full flex justify-between'}
 								onClick={() => {
 									if (isRunning) {
-										return
+										return;
 									}
-									setSelectedPhase(phase.id)
+									setSelectedPhase(phase.id);
 								}}
 							>
 								<div className={'flex items-center gap-2'}>
@@ -96,6 +96,46 @@ export function ExecutionViewer({execution}: { execution: ExecutionData }) {
 					}
 				</div>
 			</aside>
+			<div className={'flex w-full h-full'}>
+				{
+					isRunning && (
+						<div className={'flex items-center justify-center w-full h-full'}>
+							<p className={'font-bold'}>正在运行中...</p>
+						</div>
+					)
+				}
+				{
+					!isRunning && !selectedPhase && (
+						<div className={'flex items-center justify-center w-full h-full'}>
+							<p className={'font-bold'}>请选择一个步骤</p>
+						</div>
+					)
+				}
+				{
+					!isRunning && selectedPhase && phaseQuery?.data && (
+						<div className={'flex flex-col py-4 gap-4 overflow-auto container'}>
+							<div className={'flex gap-2 items-center'}>
+								<Badge variant={'outline'} className={'space-x-4'}>
+									<div className={'flex items-center gap-1'}>
+										<CoinsIcon size={18} className={'stroke-muted-foreground'}/>
+										<span>信用</span>
+									</div>
+									<span>TODO</span>
+								</Badge>
+								<Badge variant={'outline'} className={'space-x-4'}>
+									<div className={'flex items-center gap-1'}>
+										<ClockIcon size={18} className={'stroke-muted-foreground'}/>
+										<span>运行时长</span>
+									</div>
+									<span>
+										{datesToDurationString(phaseQuery?.data?.completeAt, phaseQuery?.data?.startAt) || '-'}
+									</span>
+								</Badge>
+							</div>
+						</div>
+					)
+				}
+			</div>
 		</div>
 	);
 }
