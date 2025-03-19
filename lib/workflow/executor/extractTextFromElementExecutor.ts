@@ -34,6 +34,8 @@ export async function extractTextFromElementExecutor(environment: ExecutionEnvir
 
 		environment.setOutput('Extract Text', extractText)
 
+		environment.log.info(`成功抓取 [${selector}] 文本`)
+
 		return true
 	} catch (e: any) {
 		environment.log.error(`extractTextFromElementExecutor: ${e.message}`)

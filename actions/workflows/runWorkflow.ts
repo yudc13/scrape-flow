@@ -84,7 +84,7 @@ export async function runWorkflow({workflowDefinition, workflowId}: {
     throw new Error('create workflow execution error');
   }
 
-  await executeWorkflow(execution.id)
+  executeWorkflow(execution.id)
 
   redirect(`/workflow/runs/${workflowId}/${execution.id}`)
 }

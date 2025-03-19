@@ -1,4 +1,5 @@
 import 'server-only';
+import { waitFor } from '@/lib/helper/waitFor';
 import { createLogCollector } from '@/lib/log';
 import { prisma } from '@/lib/prisma';
 import { ExecutorRegister } from '@/lib/workflow/executor/register';
@@ -149,15 +150,17 @@ async function executionWorkflowPhase(phase: ExecutionPhase, environment: Enviro
 	// 真正执行工作流的每一项步骤
 	const success = await executionPhase(phase, node, environment, edges, logCollector);
 
+	const inputs = environment.phases[node.id].inputs;
 	const outputs = environment.phases[node.id].outputs;
 
-	await finalizePhase(phase.id, success, outputs, logCollector);
+
+	await finalizePhase(phase.id, success, inputs, outputs, logCollector);
 
 	return {success};
 
 }
 
-async function finalizePhase(phaseId: string, success: boolean, outputs: Record<string, string>, logCollector: LogCollector) {
+async function finalizePhase(phaseId: string, success: boolean, inputs: Record<string, string>, outputs: Record<string, string>, logCollector: LogCollector) {
 
 	const finalizeStatus = success ? ExecutionPhaseStatus.COMPLETED : ExecutionPhaseStatus.FAILED;
 
@@ -168,6 +171,7 @@ async function finalizePhase(phaseId: string, success: boolean, outputs: Record<
 		data: {
 			status: finalizeStatus,
 			completeAt,
+			inputs: JSON.stringify(inputs),
 			outputs: JSON.stringify(outputs),
 			logs: {
 				createMany: {
@@ -189,6 +193,9 @@ async function executionPhase(phase: ExecutionPhase, node: AppNode, environment:
 	if (!runFunc) {
 		return false;
 	}
+
+	await waitFor(3000)
+
 
 	const executionEnvironment: ExecutionEnvironment<any> = createExecutionEnvironment(node, environment, logCollector);
 
@@ -219,6 +226,7 @@ function setupEnvironmentForPhase(node: AppNode, environment: Environment, edges
 		}
 
 		environment.phases[node.id].inputs[input.name] = environment.phases[connectedEdge.source].outputs[connectedEdge.sourceHandle!];
+
 	}
 }
 
